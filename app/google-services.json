@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "1000104735618",
+    "firebase_url": "https://fir-pablo-fe300-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "fir-pablo-fe300",
+    "storage_bucket": "fir-pablo-fe300.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1000104735618:android:cc72e6d8ab1722796b959b",
+        "android_client_info": {
+          "package_name": "es.iescarrillo.android.ejemplofirebasetodo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDqYevj_GwakAqS_DsrpkEH7PocoC9weK8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

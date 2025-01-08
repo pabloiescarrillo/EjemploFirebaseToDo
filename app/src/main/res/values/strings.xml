@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">MyFirstAppFirebase</string>
-    <string name="name">Name</string>
     <string name="age">Age</string>
     <string name="surname">Surname</string>
     <string name="save">Save</string>
@@ -12,4 +11,10 @@
     <string name="login">Login</string>
     <string name="sign_up">Sign up</string>
     <string name="current_user">Current User</string>
+    <string name="name">Name</string>
+    <string name="error_firebase">Error firebase conection</string>
+    <string name="delete_successfull">Delete successfully</string>
+    <string name="error_sign_up">Error sign up</string>
+    <string name="update_successfully">Update successfully</string>
+    <string name="insert_successfully">Insert successfully</string>
 </resources>

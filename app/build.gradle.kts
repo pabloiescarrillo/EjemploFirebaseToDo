@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -29,6 +30,7 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+    buildToolsVersion = "34.0.0"
 }
 
 dependencies {
@@ -41,4 +43,15 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     // TODO: Añadir dependencias Firebase
+    // Dependencias Firebase
+    // BOM => herramientas generales de Firebase
+    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
+    // Herramientas de analíticas de uso
+    implementation("com.google.firebase:firebase-analytics")
+    // Módulo Firebase Real Time
+    implementation("com.google.firebase:firebase-database")
+    // Módulo Firebase Authentication
+    implementation("com.google.firebase:firebase-auth")
+    // Servicios de Google
+    implementation("com.google.android.gms:play-services-auth")
 }
