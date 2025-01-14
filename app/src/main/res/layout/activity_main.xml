@@ -43,4 +43,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:backgroundTint="@color/blue"/>
 
+    <Button
+        android:id="@+id/btnLogout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/logout"
+        android:layout_margin="15dp"
+        android:padding="15dp"
+        android:textSize="20sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:backgroundTint="@color/red"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -17,4 +17,13 @@
     <string name="error_sign_up">Error sign up</string>
     <string name="update_successfully">Update successfully</string>
     <string name="insert_successfully">Insert successfully</string>
+    <string name="email_blank">Email is blank</string>
+    <string name="password_blank">Password is blank</string>
+    <string name="login_fail">Email or password no valid</string>
+    <string name="login_successful">Login successfull</string>
+    <string name="logout">Logout</string>
+    <string name="logout_successfull">Logout successfully</string>
+    <string name="error">An error has ocurred</string>
+    <string name="default_web_client_id">1000104735618-4hf8egu7vqom117qdgopfovc3hp7ilmm.apps.googleusercontent.com</string>
+    <string name="google">Sign In with Google Account</string>
 </resources>

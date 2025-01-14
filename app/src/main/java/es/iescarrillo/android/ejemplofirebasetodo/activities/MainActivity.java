@@ -17,6 +17,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -36,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
     // TODO: declaración componentes de la pantalla
     private TextView tvCurrentUser;
     private ListView lvPersons;
-    private Button btnAddPerson;
+    private Button btnAddPerson, btnLogout;
     private List<Person> persons;
     private PersonAdapter personAdapter;
 
@@ -96,6 +97,18 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        btnLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Método para cerrar sesión
+                FirebaseAuth.getInstance().signOut();
+
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(intent);
+                Toast.makeText(MainActivity.this, R.string.logout_successfull, Toast.LENGTH_SHORT).show();
+            }
+        });
+
         /* TODO: evento de hacer clic en un elemento del ListView => enviar a la Activity de
             inserción indicando que el editMode es true y la persona a editar
          */
@@ -113,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadCurrentUser() {
         // TODO: comprobar si hay algún usuario logueado, en caso de haberlo mostrar su email en el textView de Current User
+        tvCurrentUser.setText(FirebaseAuth.getInstance().getCurrentUser().getEmail());
     }
 
     private void loadComponents(){
@@ -120,6 +134,7 @@ public class MainActivity extends AppCompatActivity {
         tvCurrentUser = findViewById(R.id.tvCurrentUser);
         lvPersons = findViewById(R.id.lvPersons);
         btnAddPerson = findViewById(R.id.btnAddPerson);
+        btnLogout = findViewById(R.id.btnLogout);
 
         persons = new ArrayList<>();
     }

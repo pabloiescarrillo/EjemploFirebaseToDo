@@ -13,7 +13,20 @@
           "package_name": "es.iescarrillo.android.ejemplofirebasetodo"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1000104735618-gv6pe0us39far0fdvg68glh12ablser1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "es.iescarrillo.android.ejemplofirebasetodo",
+            "certificate_hash": "917c98a67dac26b286e58691de45bf8931a2d08f"
+          }
+        },
+        {
+          "client_id": "1000104735618-4hf8egu7vqom117qdgopfovc3hp7ilmm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDqYevj_GwakAqS_DsrpkEH7PocoC9weK8"
@@ -21,7 +34,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1000104735618-4hf8egu7vqom117qdgopfovc3hp7ilmm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

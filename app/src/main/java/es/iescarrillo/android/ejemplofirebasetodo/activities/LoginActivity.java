@@ -2,15 +2,27 @@ package es.iescarrillo.android.ejemplofirebasetodo.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 
 import es.iescarrillo.android.ejemplofirebasetodo.R;
 
@@ -18,11 +30,28 @@ public class LoginActivity extends AppCompatActivity {
 
     // TODO: declaración componentes de la pantalla
     private EditText etEmail, etPassword;
-    private Button btnLogin, btnSignUp;
+    private Button btnLogin, btnSignUp, btnGoogle;
 
     // TODO: declaración variables del Intent
 
     // TODO: declaración servicios a usar en la Activity
+
+    // Variables de configuración de Google SignIn
+    GoogleSignInOptions googleSignInOptions;
+    GoogleSignInClient googleSignInClient;
+
+    // Constantes
+    private static final int REQ_CODE_GOOGLE_SIGN_IN = 2;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if(FirebaseAuth.getInstance().getCurrentUser() != null){
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(intent);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +69,36 @@ public class LoginActivity extends AppCompatActivity {
         a la Activity de Main, en caso contrario mostrar mensaje de error.
         No olvides comprobar que los campos sean blancos
          */
+        btnLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(etEmail.getText().toString().isBlank()){
+                    Toast.makeText(LoginActivity.this, R.string.email_blank, Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if(etPassword.getText().toString().isBlank()){
+                    Toast.makeText(LoginActivity.this, R.string.password_blank, Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                FirebaseAuth instanceAuth = FirebaseAuth.getInstance();
+                instanceAuth.signInWithEmailAndPassword(etEmail.getText().toString(), etPassword.getText().toString())
+                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if(task.isSuccessful()){
+                                    Toast.makeText(LoginActivity.this, R.string.login_successful, Toast.LENGTH_SHORT).show();
+                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                } else {
+                                    Toast.makeText(LoginActivity.this, R.string.login_fail, Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+            }
+        });
 
         // TODO: evento del botón de SignUp => enviar a la Activity de inserción indicando que el editMode es falso
         btnSignUp.setOnClickListener(new View.OnClickListener() {
@@ -51,6 +110,22 @@ public class LoginActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        // TODO: evento del botón de SignUpGoogle => llamar al intent de Google
+        btnGoogle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = googleSignInClient.getSignInIntent();
+                startActivityForResult(intent, REQ_CODE_GOOGLE_SIGN_IN);
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        Log.i("onActivityResult", String.valueOf(requestCode));
     }
 
     private void loadComponents(){
@@ -59,5 +134,16 @@ public class LoginActivity extends AppCompatActivity {
         etPassword = findViewById(R.id.etPasswordLogin);
         btnLogin = findViewById(R.id.btnLogin);
         btnSignUp = findViewById(R.id.btnSignUp);
+        btnGoogle = findViewById(R.id.btnGoogle);
+
+        // Configuramos las opciones de registro
+        googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .requestProfile()
+                .build();
+
+        // Inicializar variable del cliente web, necesitamos el contexto y las opciones
+        googleSignInClient = GoogleSignIn.getClient(LoginActivity.this, googleSignInOptions);
     }
 }

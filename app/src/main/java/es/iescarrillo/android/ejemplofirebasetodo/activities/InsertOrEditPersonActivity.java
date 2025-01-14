@@ -128,12 +128,23 @@ public class InsertOrEditPersonActivity extends AppCompatActivity {
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                personService.delete(person);
+                FirebaseAuth.getInstance().getCurrentUser().delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if(task.isSuccessful()){
+                            personService.delete(person);
 
-                Intent intent = new Intent(InsertOrEditPersonActivity.this, MainActivity.class);
-                Toast.makeText(InsertOrEditPersonActivity.this, R.string.delete_successfull, Toast.LENGTH_SHORT).show();
-                startActivity(intent);
-                finish();
+                            Intent intent = new Intent(InsertOrEditPersonActivity.this, LoginActivity.class);
+                            Toast.makeText(InsertOrEditPersonActivity.this, R.string.delete_successfull, Toast.LENGTH_SHORT).show();
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            Toast.makeText(InsertOrEditPersonActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+
+
             }
         });
     }
