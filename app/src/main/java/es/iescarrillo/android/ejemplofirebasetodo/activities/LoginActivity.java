@@ -17,12 +17,20 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import es.iescarrillo.android.ejemplofirebasetodo.R;
 
@@ -121,11 +129,69 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    // TODO: registrar el usuario en el módulo de FirebaseAuth y en caso de que ya exista mostrar la MainActivity
+    // en caso contrario, mostrar la pantalla de registro con los datos precargados
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        Log.i("onActivityResult", String.valueOf(requestCode));
+        if(requestCode==REQ_CODE_GOOGLE_SIGN_IN){
+            try {
+                // Guardamos datos de la cuenta de Google seleccionada
+                GoogleSignInAccount googleSignInAccount = GoogleSignIn.getSignedInAccountFromIntent(data).getResult();
+                AuthCredential credential = GoogleAuthProvider.getCredential(googleSignInAccount.getIdToken(), null);
+
+                FirebaseAuth instanceAuth = FirebaseAuth.getInstance();
+                instanceAuth.signInWithCredential(credential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if(task.isSuccessful()){
+                            FirebaseUser currentUser = instanceAuth.getCurrentUser();
+
+                            /* Vamos a comprobar si existe una persona en el módulo de
+                            * RealTimeDatabase con el UID del currentUser
+                            * en caso de que no exista mostraremos la pantalla de registro con los
+                            * datos precargados con los que hemos obtenido de su cuenta de Google
+                            * en caso de que si exita mostraremos la MainActivity
+                            */
+                            FirebaseDatabase.getInstance().getReference("persons")
+                                    .orderByChild("uid").equalTo(currentUser.getUid())
+                                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            // Tenemos comprobar si el snapshot contine algún valor
+                                            if(snapshot.exists()){
+                                                // El usuario ya está logueado
+                                                Toast.makeText(LoginActivity.this, R.string.login_successful, Toast.LENGTH_SHORT).show();
+                                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                                startActivity(intent);
+                                                finish();
+                                            } else { // No ha encontrado ninguna persona con el UID
+                                                Intent intent = new Intent(LoginActivity.this, InsertOrEditPersonActivity.class);
+                                                intent.putExtra("editMode", false);
+                                                startActivity(intent);
+                                                finish();
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                        }
+                                    });
+
+
+                        } else {
+                            Toast.makeText(LoginActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+
+            } catch (Exception e){
+                Log.e("LoginActivity - Error", e.getMessage().toString());
+            }
+
+        }
     }
 
     private void loadComponents(){

@@ -18,6 +18,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.Objects;
 
@@ -35,6 +36,9 @@ public class InsertOrEditPersonActivity extends AppCompatActivity {
     // TODO: declaración variables del Intent
     private Boolean editMode;
     private Person person;
+
+    // TODO: variables locales
+    private FirebaseAuth instanceAuth;
 
     // TODO: declaración servicios a usar en la Activity
     private PersonService personService;
@@ -57,6 +61,16 @@ public class InsertOrEditPersonActivity extends AppCompatActivity {
             etSurname.setText(person.getSurname());
             etAge.setText(person.getAge().toString());
             etEmail.setText(person.getEmail());
+        }
+
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if(currentUser != null){
+            etName.setText(currentUser.getDisplayName());
+            etEmail.setText(currentUser.getEmail());
+            etPassword.setVisibility(View.GONE);
+            etEmail.setEnabled(false);
+
+
         }
 
         // TODO: evento para volver a la pantalla principal si se pulsa el botón cancelar
@@ -82,45 +96,26 @@ public class InsertOrEditPersonActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Instancia del módulo de Authenticación
-                FirebaseAuth instanceAuth = FirebaseAuth.getInstance();
-                instanceAuth.createUserWithEmailAndPassword(etEmail.getText().toString(), etPassword.getText().toString())
-                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                if(task.isSuccessful()){
-                                    // Se ejecuta este bloque si el registro es correcto
-                                    person.setAge(Integer.valueOf(etAge.getText().toString()));
-                                    person.setEmail(etEmail.getText().toString());
-                                    person.setName(etName.getText().toString());
-                                    person.setSurname(etSurname.getText().toString());
+                instanceAuth = FirebaseAuth.getInstance();
 
-                                    // Obtenemos el UID del usuario creado en el módulo de Autenticación
-                                    person.setUid(Objects.requireNonNull(instanceAuth.getCurrentUser()).getUid());
-
-                                    person.setProvider(Provider.EMAIL);
-
-                                    if(editMode){
-                                        // Funcionalidad de edición
-                                        personService.update(person);
-                                        Toast.makeText(InsertOrEditPersonActivity.this, R.string.update_successfully, Toast.LENGTH_SHORT).show();
+                if(instanceAuth.getCurrentUser() == null) {
+                    instanceAuth.createUserWithEmailAndPassword(etEmail.getText().toString(), etPassword.getText().toString())
+                            .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    if (task.isSuccessful()) {
+                                        // Se ejecuta este bloque si el registro es correcto
+                                        createPerson();
                                     } else {
-                                        // Funcionalidad de inserción
-                                        personService.insert(person);
-                                        Toast.makeText(InsertOrEditPersonActivity.this, R.string.insert_successfully, Toast.LENGTH_SHORT).show();
+                                        // Se ejecuta este bloque si se ha producido un error en el registro
+                                        Toast.makeText(InsertOrEditPersonActivity.this, R.string.error_sign_up, Toast.LENGTH_SHORT)
+                                                .show();
                                     }
-
-                                    // Volvemos a la pantalla de Main
-                                    Intent intent = new Intent(InsertOrEditPersonActivity.this, MainActivity.class);
-                                    startActivity(intent);
-
-                                } else {
-                                    // Se ejecuta este bloque si se ha producido un error en el registro
-                                    Toast.makeText(InsertOrEditPersonActivity.this, R.string.error_sign_up, Toast.LENGTH_SHORT)
-                                            .show();
                                 }
-                            }
-                        });
-
+                            });
+                } else {
+                    createPerson();
+                }
             }
         });
 
@@ -147,6 +142,34 @@ public class InsertOrEditPersonActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void createPerson(){
+        person.setAge(Integer.valueOf(etAge.getText().toString()));
+        person.setEmail(etEmail.getText().toString());
+        person.setName(etName.getText().toString());
+        person.setSurname(etSurname.getText().toString());
+
+        // Obtenemos el UID del usuario creado en el módulo de Autenticación
+        person.setUid(Objects.requireNonNull(instanceAuth.getCurrentUser()).getUid());
+
+        if (editMode) {
+            // Funcionalidad de edición
+            personService.update(person);
+            Toast.makeText(InsertOrEditPersonActivity.this, R.string.update_successfully, Toast.LENGTH_SHORT).show();
+        } else {
+            // Funcionalidad de inserción
+            if (instanceAuth.getCurrentUser() != null)
+                person.setProvider(Provider.GOOGLE);
+            else
+                person.setProvider(Provider.EMAIL);
+            personService.insert(person);
+            Toast.makeText(InsertOrEditPersonActivity.this, R.string.insert_successfully, Toast.LENGTH_SHORT).show();
+        }
+
+        // Volvemos a la pantalla de Main
+        Intent intent = new Intent(InsertOrEditPersonActivity.this, MainActivity.class);
+        startActivity(intent);
     }
 
     private void loadComponents(){
