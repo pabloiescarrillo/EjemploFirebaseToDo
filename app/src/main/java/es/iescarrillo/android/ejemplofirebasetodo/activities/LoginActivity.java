@@ -141,6 +141,7 @@ public class LoginActivity extends AppCompatActivity {
                 GoogleSignInAccount googleSignInAccount = GoogleSignIn.getSignedInAccountFromIntent(data).getResult();
                 AuthCredential credential = GoogleAuthProvider.getCredential(googleSignInAccount.getIdToken(), null);
 
+                // Creamos el usuario en Firebase Auth
                 FirebaseAuth instanceAuth = FirebaseAuth.getInstance();
                 instanceAuth.signInWithCredential(credential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override

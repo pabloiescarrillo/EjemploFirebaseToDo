@@ -145,7 +145,7 @@ public class InsertOrEditPersonActivity extends AppCompatActivity {
     }
 
     private void createPerson(){
-        person.setAge(Integer.valueOf(etAge.getText().toString()));
+        person.setAge(etAge.getText().toString().isBlank() ? null : Integer.valueOf(etAge.getText().toString()));
         person.setEmail(etEmail.getText().toString());
         person.setName(etName.getText().toString());
         person.setSurname(etSurname.getText().toString());
